@@ -18,6 +18,7 @@ class Player:
     drawedCards = [[False] * 13 for i in range(4)]
     def __init__(self):
         self.hands = []
+        self.isAce = False
         for i in range(2):
           self.draw()
     
