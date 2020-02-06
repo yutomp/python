@@ -15,16 +15,24 @@ class Card:
         return self.cardKinds[num]
 
 class Player:
+    drawedCards = [[False] * 13 for i in range(4)]
     def __init__(self):
         self.hands = []
         for i in range(2):
           self.draw()
-
+    
     def draw(self):
         card = Card()
-        randomNumber = random.randrange(13)
-        self.hands.append(card.getNumber(randomNumber))
-        print(card.getCardKinds(random.randrange(4)) + card.getCards(randomNumber) + "をドローしました。")
+        #重複時のやり直し
+        while True:
+            self.randomCardNumber = random.randrange(13)
+            self.randomCard = self.randomCardNumber
+            self.randomCardKinds = random.randrange(4)
+            if self.drawedCards[self.randomCardKinds][self.randomCard] == False:
+                self.drawedCards[self.randomCardKinds][self.randomCard] = True
+                self.hands.append(card.getNumber(self.randomCardNumber))
+                print(card.getCardKinds(self.randomCardKinds) + card.getCards(self.randomCard) + "をドローしました。")
+                break
 
     def getSum(self):
         self.sum = 0
@@ -40,7 +48,6 @@ player = Player()
 while True:
     print("カードをドローしますか？（はい:y、　いいえ：それ以外）")
     if input() == "y":
-        print("カードをドローします。")
         player.draw()
     else:
         break
@@ -55,9 +62,11 @@ while True:
 print("ディーラーの合計は" + str(dealer.getSum()) + "です。")
 
 #判定
-if player.getSum() > dealer.getSum() and (player.getSum() <= 21 and dealer.getSum() > 21):
+if (player.getSum() > 21 and dealer.getSum() > 21) or player.getSum() == dealer.getSum():
+    print("引き分けです。")   
+elif player.getSum() <= 21 and (dealer.getSum() > 21 or player.getSum() > dealer.getSum()):
     print("あなたの勝ちです！！")
-elif player.getSum() < dealer.getSum() and (player.getSum() > 21 and dealer.getSum() <= 21):
-    print("ディーラーの勝ちです・・・")
-else:
-    print("引き分けです。")    
+elif (player.getSum() > 21 or player.getSum() < dealer.getSum()) and dealer.getSum() <= 21:
+    print("あなたの負けです・・・")
+
+     
