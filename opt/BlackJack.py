@@ -1,4 +1,5 @@
 import random
+import sys
 
 class Card:
     cardNumbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10]
@@ -18,13 +19,12 @@ class Player:
     drawedCards = [[False] * 13 for i in range(4)]
     def __init__(self):
         self.hands = []
-        self.isAce = False
         for i in range(2):
           self.draw()
     
     def draw(self):
         card = Card()
-        #重複時のやり直し
+        # 重複時のやり直し
         while True:
             self.randomCardNumber = random.randrange(13)
             self.randomCard = self.randomCardNumber
@@ -37,14 +37,31 @@ class Player:
 
     def getSum(self):
         self.sum = 0
+        self.isAce = False
+        self.aceCount = 0
         for i in self.hands:
-            self.sum += i
+            # ドローしたカードにAがあるかを確認
+            if i == 1:
+                self.isAce = True
+                self.aceCount += 1
+                pass
+            else:
+                self.sum += i
+        # "A"が存在するときの処理（1 or 10どちらを足すか）
+        if self.isAce:
+            for l in range(self.aceCount):
+                if self.sum <= 11:
+                    self.sum += 10
+                else:
+                    self.sum += 1
+        
         return self.sum
+          
 
 
 print("-----Game Start-----")
 
-#プレイヤー
+#プレイヤー側
 player = Player()
 while True:
     print("カードをドローしますか？（はい:y、　いいえ：それ以外）")
@@ -52,9 +69,13 @@ while True:
         player.draw()
     else:
         break
-print("あなたの合計は" + str(player.getSum()) + "です。")
 
-#ディーラー
+print("あなたの合計は" + str(player.getSum()) + "です。")
+if player.getSum() > 21:
+    print("あなたはバーストしました。あなたの負けです・・・。")
+    sys.exit()
+
+#ディーラー側
 dealer = Player()
 while True:
     if dealer.getSum() >= 17:
@@ -63,11 +84,11 @@ while True:
 print("ディーラーの合計は" + str(dealer.getSum()) + "です。")
 
 #判定
-if (player.getSum() > 21 and dealer.getSum() > 21) or player.getSum() == dealer.getSum():
-    print("引き分けです。")   
-elif player.getSum() <= 21 and (dealer.getSum() > 21 or player.getSum() > dealer.getSum()):
+if player.getSum() > dealer.getSum() or dealer.getSum() > 21:
     print("あなたの勝ちです！！")
-elif (player.getSum() > 21 or player.getSum() < dealer.getSum()) and dealer.getSum() <= 21:
+elif player.getSum() < dealer.getSum():
     print("あなたの負けです・・・")
+else:
+    print("引き分けです。") 
 
      
